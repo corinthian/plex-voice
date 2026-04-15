@@ -1,6 +1,6 @@
 # plexctl — Project Status
 
-Last updated: 2026-04-15
+Last updated: 2026-04-16
 
 ---
 
@@ -24,8 +24,17 @@ All commands implemented and verified against live Apple TV.
 | `plexctl search <query> [--type]` | Done |
 | `plexctl play-latest <query>` | Done (shows + movie fallback) |
 | `plexctl play-media <ratingKey>` | Done |
+| `plexctl queue <ratingKey> [...]` | Done |
 
 Tests: 75/75 passing (`pipx run pytest tests/`)
+
+### Play queue (added 2026-04-16)
+
+`plexctl queue <ratingKey> [ratingKey ...]  [--client NAME] [--shuffle] [--repeat]`
+
+Creates a Plex play queue from one or more ratingKeys and starts playback immediately.
+Episodes autoplay in sequence. Fix required: Apple TV demands `key=/playQueues/{id}`
+even when `playQueueID` is also present.
 
 ---
 

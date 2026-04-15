@@ -70,6 +70,8 @@ Parse natural time expressions: "two minutes" → `2:00`, "a minute and a half" 
 | "play next episode of [show]" | `plexctl play-latest "[show]" --unwatched` |
 | "play the next unwatched [show]" | `plexctl play-latest "[show]" --unwatched` |
 | "play it on [client]" (after search) | add `--client "[client]"` |
+| "queue up the next 3 episodes of [show]" | find ratingKeys, then `plexctl queue <k1> <k2> <k3>` |
+| "shuffle [show]" | find episode keys, then `plexctl queue <keys...> --shuffle` |
 
 ### Search / Query
 
