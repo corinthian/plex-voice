@@ -1,7 +1,7 @@
 import json
 import sys
 import click
-from plexctl import playback, library
+from plexctl import playback, library, queue as _queue_mod
 from plexctl import clients as _clients_mod
 from plexctl import auth as _auth_mod
 
@@ -150,3 +150,22 @@ def play_latest(query, client, unwatched):
 def play_media(rating_key, client):
     """Play a specific item by ratingKey."""
     _out(playback.play_media(_resolve(client), rating_key))
+
+
+@cli.command("queue")
+@click.argument("rating_keys", nargs=-1, required=True)
+@click.option("--client", "-c", default=None)
+@click.option("--shuffle", is_flag=True, default=False)
+@click.option("--repeat", is_flag=True, default=False)
+def queue_cmd(rating_keys, client, shuffle, repeat):
+    """Create a play queue and start playing immediately."""
+    q = _queue_mod.create(list(rating_keys), shuffle=shuffle, repeat=repeat)
+    if not q.get("ok"):
+        _out(q)
+        return
+    target = _resolve(client)
+    result = playback.play_queue(target, q["playQueueID"], q["selectedItemID"])
+    if result.get("ok"):
+        result["playQueueID"] = q["playQueueID"]
+        result["selectedItemID"] = q["selectedItemID"]
+    _out(result)
