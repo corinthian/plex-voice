@@ -116,6 +116,27 @@ def seek(client: dict, position: str) -> dict:
     return {"ok": False, "error": f"unrecognised position format: {position!r}"}
 
 
+def play_queue(client: dict, queue_id: str, selected_item_id: str) -> dict:
+    server_id = _get_server_machine_id()
+    if not server_id:
+        return {"ok": False, "error": "could not retrieve server machineIdentifier"}
+    c = cfg.load()
+    server_url = c.get("server_url", cfg.DEFAULTS["server_url"])
+    from urllib.parse import urlparse
+    parsed = urlparse(server_url)
+    address = parsed.hostname
+    port = parsed.port or 32400
+    return _player_cmd(client, "/player/playback/playMedia", {
+        "key": f"/playQueues/{queue_id}",
+        "playQueueID": queue_id,
+        "playQueueSelectedItemID": selected_item_id,
+        "machineIdentifier": server_id,
+        "address": address,
+        "port": port,
+        "offset": 0,
+    })
+
+
 def play_media(client: dict, rating_key: str) -> dict:
     server_id = _get_server_machine_id()
     if not server_id:
