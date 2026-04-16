@@ -30,8 +30,14 @@ All commands implemented and verified against live Apple TV.
 | `plexctl queue-unshuffle` | Done |
 | `plexctl queue-clear` | Done |
 | `plexctl queue-remove <itemId>` | Done |
+| `plexctl now-playing` | Done |
+| `plexctl watched [ratingKey]` | Done (auto-targets playing item) |
+| `plexctl unwatched [ratingKey]` | Done (auto-targets playing item) |
+| `plexctl rate RATING [ratingKey]` | Done (auto-targets playing item) |
+| `plexctl continue-watching` | Done |
+| `plexctl history [--limit N]` | Done |
 
-Tests: 90/90 passing (`pipx run pytest tests/`)
+Tests: 108/108 passing (`pipx run pytest tests/`)
 
 ### Play queue (added 2026-04-16)
 
@@ -104,6 +110,7 @@ Voice (iPad) → macOS Claude Code → plexctl CLI
 │   ├── clients.py
 │   ├── library.py
 │   ├── playback.py
+│   ├── sessions.py
 │   └── cli.py
 └── tests/
     └── test_intent_examples.py
@@ -134,4 +141,3 @@ persistent subscriber session. There is no simple HTTP path for external scripts
 - Volume on Apple TV: tvOS may not honor Plex volume commands vs system volume (untested)
 - End-to-end iPad → macOS Claude → plexctl voice relay not yet exercised
 - iPad client controllability unverified (expected to work like Apple TV)
-- No `now-playing` command (`what's playing` maps to `clients` as proxy)

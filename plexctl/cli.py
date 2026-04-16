@@ -4,6 +4,7 @@ import click
 from plexctl import playback, library, queue as _queue_mod
 from plexctl import clients as _clients_mod
 from plexctl import auth as _auth_mod
+from plexctl import sessions as _sessions_mod
 
 
 def _resolve(client_name):
@@ -205,3 +206,63 @@ def queue_clear(client):
 def queue_remove(item_id, client):
     """Remove a specific item from the current play queue by playQueueItemID."""
     _out(_queue_mod.remove_item(_resolve(client), item_id))
+
+
+@cli.command("now-playing")
+@click.option("--client", "-c", default=None)
+def now_playing(client):
+    """Show what's currently playing."""
+    _out(_sessions_mod.now_playing(_resolve(client)))
+
+
+@cli.command("watched")
+@click.argument("rating_key", required=False)
+@click.option("--client", "-c", default=None)
+def watched(rating_key, client):
+    """Mark an item watched. Omit RATING_KEY to target currently playing."""
+    target = _resolve(client)
+    key = rating_key or _sessions_mod.current_rating_key(target)
+    if not key:
+        _out({"ok": False, "error": "nothing playing — provide a ratingKey"})
+        return
+    _out(library.scrobble(key))
+
+
+@cli.command("unwatched")
+@click.argument("rating_key", required=False)
+@click.option("--client", "-c", default=None)
+def unwatched(rating_key, client):
+    """Mark an item unwatched. Omit RATING_KEY to target currently playing."""
+    target = _resolve(client)
+    key = rating_key or _sessions_mod.current_rating_key(target)
+    if not key:
+        _out({"ok": False, "error": "nothing playing — provide a ratingKey"})
+        return
+    _out(library.unscrobble(key))
+
+
+@cli.command("rate")
+@click.argument("rating", type=click.IntRange(0, 10))
+@click.argument("rating_key", required=False)
+@click.option("--client", "-c", default=None)
+def rate_cmd(rating, rating_key, client):
+    """Rate an item 0–10. Omit RATING_KEY to target currently playing."""
+    target = _resolve(client)
+    key = rating_key or _sessions_mod.current_rating_key(target)
+    if not key:
+        _out({"ok": False, "error": "nothing playing — provide a ratingKey"})
+        return
+    _out(library.rate(key, rating))
+
+
+@cli.command("continue-watching")
+def continue_watching():
+    """List the continue-watching shelf."""
+    _out(_sessions_mod.continue_watching())
+
+
+@cli.command("history")
+@click.option("--limit", "-n", default=10, type=int, help="Number of entries to return")
+def history(limit):
+    """Show recent watch history."""
+    _out(_sessions_mod.history(limit))

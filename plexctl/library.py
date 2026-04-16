@@ -47,3 +47,18 @@ def latest_unwatched_episode(show_query: str) -> dict | None:
         return unwatched[0]
 
     return max(episodes, key=lambda e: e.get("originallyAvailableAt", ""))
+
+
+def scrobble(rating_key: str) -> dict:
+    api.get("/:/scrobble", params={"key": rating_key, "identifier": "com.plexapp.plugins.library"})
+    return {"ok": True}
+
+
+def unscrobble(rating_key: str) -> dict:
+    api.get("/:/unscrobble", params={"key": rating_key, "identifier": "com.plexapp.plugins.library"})
+    return {"ok": True}
+
+
+def rate(rating_key: str, rating: int) -> dict:
+    api.get("/:/rate", params={"key": rating_key, "identifier": "com.plexapp.plugins.library", "rating": rating})
+    return {"ok": True}
