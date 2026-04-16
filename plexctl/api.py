@@ -91,3 +91,21 @@ def put(path: str, params: dict | None = None, timeout: int = 10) -> dict:
     except requests.exceptions.HTTPError as e:
         print(f'{{"ok": false, "error": "HTTP {r.status_code}: {r.text[:200]}"}}')
         sys.exit(1)
+
+
+def delete(path: str, params: dict | None = None, timeout: int = 10) -> dict:
+    c = cfg.load()
+    server = c.get("server_url", cfg.DEFAULTS["server_url"])
+    token = cfg.require("token")
+    client_id = c.get("client_id", cfg.DEFAULTS["client_id"])
+    url = server.rstrip("/") + path
+    try:
+        r = requests.delete(url, headers=_headers(token, client_id), params=params, timeout=timeout)
+        r.raise_for_status()
+        return r.json()
+    except requests.exceptions.ConnectionError as e:
+        print(f'{{"ok": false, "error": "connection failed: {e}"}}')
+        sys.exit(1)
+    except requests.exceptions.HTTPError as e:
+        print(f'{{"ok": false, "error": "HTTP {r.status_code}: {r.text[:200]}"}}')
+        sys.exit(1)
