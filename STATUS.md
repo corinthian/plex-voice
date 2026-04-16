@@ -25,8 +25,13 @@ All commands implemented and verified against live Apple TV.
 | `plexctl play-latest <query>` | Done (shows + movie fallback) |
 | `plexctl play-media <ratingKey>` | Done |
 | `plexctl queue <ratingKey> [...]` | Done |
+| `plexctl queue-show` | Done |
+| `plexctl queue-shuffle` | Done |
+| `plexctl queue-unshuffle` | Done |
+| `plexctl queue-clear` | Done |
+| `plexctl queue-remove <itemId>` | Done |
 
-Tests: 75/75 passing (`pipx run pytest tests/`)
+Tests: 90/90 passing (`pipx run pytest tests/`)
 
 ### Play queue (added 2026-04-16)
 

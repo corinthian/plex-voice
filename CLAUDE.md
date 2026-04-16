@@ -87,6 +87,16 @@ Parse natural time expressions: "two minutes" → `2:00`, "a minute and a half" 
 |---|---|
 | "list clients", "what clients are available" | `plexctl clients` |
 
+### Queue Management
+
+| Speech | Command |
+|---|---|
+| "show the queue", "what's in the queue" | `plexctl queue-show` |
+| "shuffle the queue" | `plexctl queue-shuffle` |
+| "stop shuffling", "unshuffle" | `plexctl queue-unshuffle` |
+| "clear the queue" | `plexctl queue-clear` |
+| "remove item [N] from the queue" | `plexctl queue-remove <playQueueItemID>` |
+
 ---
 
 ## Example Mappings

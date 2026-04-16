@@ -169,3 +169,39 @@ def queue_cmd(rating_keys, client, shuffle, repeat):
         result["playQueueID"] = q["playQueueID"]
         result["selectedItemID"] = q["selectedItemID"]
     _out(result)
+
+
+@cli.command("queue-show")
+@click.option("--client", "-c", default=None)
+def queue_show(client):
+    """Show current play queue."""
+    _out(_queue_mod.show(_resolve(client)))
+
+
+@cli.command("queue-shuffle")
+@click.option("--client", "-c", default=None)
+def queue_shuffle(client):
+    """Shuffle the current play queue."""
+    _out(_queue_mod.shuffle(_resolve(client)))
+
+
+@cli.command("queue-unshuffle")
+@click.option("--client", "-c", default=None)
+def queue_unshuffle(client):
+    """Turn off shuffle on the current play queue."""
+    _out(_queue_mod.unshuffle(_resolve(client)))
+
+
+@cli.command("queue-clear")
+@click.option("--client", "-c", default=None)
+def queue_clear(client):
+    """Remove all items from the current play queue."""
+    _out(_queue_mod.clear(_resolve(client)))
+
+
+@cli.command("queue-remove")
+@click.argument("item_id")
+@click.option("--client", "-c", default=None)
+def queue_remove(item_id, client):
+    """Remove a specific item from the current play queue by playQueueItemID."""
+    _out(_queue_mod.remove_item(_resolve(client), item_id))
