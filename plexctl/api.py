@@ -48,7 +48,7 @@ def get(path: str, params: dict | None = None, timeout: int = 10) -> dict:
     try:
         r = requests.get(url, headers=_headers(token, client_id), params=params, timeout=timeout)
         r.raise_for_status()
-        return r.json()
+        return r.json() if r.text.strip() else {}
     except requests.exceptions.ConnectionError as e:
         print(f'{{"ok": false, "error": "connection failed: {e}"}}')
         sys.exit(1)
