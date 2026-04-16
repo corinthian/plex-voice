@@ -79,7 +79,24 @@ Parse natural time expressions: "two minutes" → `2:00`, "a minute and a half" 
 |---|---|
 | "search for [query]" | `plexctl search "[query]"` |
 | "find [show or movie]" | `plexctl search "[query]"` |
-| "what's playing", "what's on" | `plexctl clients` (note: full session info not yet implemented; use as proxy) |
+| "what's playing", "what's on" | `plexctl now-playing` |
+
+### Status & History
+
+| Speech | Command |
+|---|---|
+| "continue watching", "what can I continue" | `plexctl continue-watching` |
+| "what did I watch", "show history" | `plexctl history [--limit N]` |
+
+### Rating & Watched Status
+
+RATING_KEY is optional — omit to auto-target the currently playing item.
+
+| Speech | Command |
+|---|---|
+| "mark this watched" | `plexctl watched [RATING_KEY]` |
+| "mark as unwatched" | `plexctl unwatched [RATING_KEY]` |
+| "rate this 8" | `plexctl rate 8 [RATING_KEY]` |
 
 ### Client List
 
@@ -116,7 +133,7 @@ Parse natural time expressions: "two minutes" → `2:00`, "a minute and a half" 
 | "play the latest Strange New Worlds on the TV" | `plexctl play-latest "Strange New Worlds" --client "Apple TV"` |
 | "play the next unwatched episode of The Bear" | `plexctl play-latest "The Bear" --unwatched` |
 | "search for Dune" | `plexctl search "Dune"` |
-| "what's playing" | `plexctl clients` |
+| "what's playing" | `plexctl now-playing` |
 | "list available clients" | `plexctl clients` |
 
 ---

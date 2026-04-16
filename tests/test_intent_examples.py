@@ -53,8 +53,15 @@ INTENT_EXAMPLES = [
         ["plexctl", "play-media", "12345", "--client", "Bedroom TV"],
     ),
     # Clients / status
-    ("what's playing", ["plexctl", "clients"]),
+    ("what's playing", ["plexctl", "now-playing"]),
+    ("what's on", ["plexctl", "now-playing"]),
     ("list available clients", ["plexctl", "clients"]),
+    # Now-playing / status
+    ("mark this watched", ["plexctl", "watched"]),
+    ("mark as unwatched", ["plexctl", "unwatched"]),
+    ("rate this 8", ["plexctl", "rate", "8"]),
+    ("continue watching", ["plexctl", "continue-watching"]),
+    ("what did I watch", ["plexctl", "history"]),
     # pause with explicit client
     ("pause on the bedroom TV", ["plexctl", "pause", "--client", "Bedroom TV"]),
     # Queue management
@@ -84,5 +91,6 @@ def test_intent_subcommand_valid(phrase, argv):
         "auth", "clients", "play", "pause", "stop", "seek",
         "next", "prev", "volume", "search", "play-latest", "play-media",
         "queue-show", "queue-shuffle", "queue-unshuffle", "queue-clear", "queue-remove",
+        "now-playing", "watched", "unwatched", "rate", "continue-watching", "history",
     }
     assert argv[1] in valid, f"Unknown subcommand {argv[1]!r} for phrase: {phrase!r}"
