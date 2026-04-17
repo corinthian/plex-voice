@@ -106,6 +106,9 @@ def volume(level, client):
 @click.option("--json", "as_json", is_flag=True, default=False, help="Emit full metadata JSON")
 def search(query, media_type, as_json):
     """Search the library."""
+    if not query or not query.strip():
+        _out({"ok": False, "error": "query cannot be empty"})
+        return
     results = library.search(query, media_type)
     if as_json:
         print(json.dumps({"ok": True, "results": results}))
@@ -121,7 +124,8 @@ def search(query, media_type, as_json):
 @click.argument("query")
 @click.option("--client", "-c", default=None)
 @click.option("--unwatched", is_flag=True, default=False, help="Force next unwatched episode")
-def play_latest(query, client, unwatched):
+@click.option("--key-only", is_flag=True, default=False, help="Resolve ratingKey without starting playback")
+def play_latest(query, client, unwatched, key_only):
     """Play the latest/next unwatched episode of a show, or a movie if no show found."""
     item = library.latest_unwatched_episode(query)
     if not item:
@@ -131,6 +135,17 @@ def play_latest(query, client, unwatched):
             _out({"ok": False, "error": f"nothing found for: {query!r}"})
             return
         item = movies[0]
+    if key_only:
+        _out({
+            "ok": True,
+            "ratingKey": item.get("ratingKey"),
+            "title": item.get("title"),
+            "type": item.get("type"),
+            "season": item.get("parentIndex"),
+            "episode": item.get("index"),
+            "year": item.get("year"),
+        })
+        return
     target = _resolve(client)
     result = playback.play_media(target, item["ratingKey"])
     if result.get("ok"):

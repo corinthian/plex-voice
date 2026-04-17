@@ -32,6 +32,11 @@ INTENT_EXAMPLES = [
     # play-latest — default client
     ("play Strange New Worlds", ["plexctl", "play-latest", "Strange New Worlds"]),
     ("play the latest The Bear", ["plexctl", "play-latest", "The Bear"]),
+    # play-latest — key-only (resolve without playback)
+    (
+        "get ratingKey for Stranger Things",
+        ["plexctl", "play-latest", "Stranger Things", "--key-only"],
+    ),
     # play-latest — with --unwatched
     (
         "play next episode of Strange New Worlds",
