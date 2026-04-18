@@ -30,6 +30,8 @@ def create(rating_keys: list[str], shuffle: bool = False, repeat: bool = False) 
         if not result.get("ok"):
             return result
 
+    if selected_id is None:
+        return {"ok": False, "error": "playQueue created but PMS returned no playQueueSelectedItemID"}
     return {"ok": True, "playQueueID": str(queue_id), "selectedItemID": str(selected_id)}
 
 

@@ -23,7 +23,8 @@ def save(data: dict) -> None:
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     lines = []
     for k, v in data.items():
-        lines.append(f'{k} = "{v}"')
+        escaped = str(v).replace("\\", "\\\\").replace('"', '\\"')
+        lines.append(f'{k} = "{escaped}"')
     CONFIG_PATH.write_text("\n".join(lines) + "\n")
     CONFIG_PATH.chmod(0o600)
 
