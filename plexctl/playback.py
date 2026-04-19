@@ -46,6 +46,47 @@ def _player_cmd(client: dict, path: str, extra_params: dict | None = None) -> di
         return {"ok": False, "error": str(e)}
 
 
+def _player_get(client: dict, path: str, extra_params: dict | None = None) -> dict | None:
+    """GET from the client's Companion endpoint; returns parsed JSON or None on error."""
+    c = cfg.load()
+    token = cfg.require("token")
+    client_id = c.get("client_id", cfg.DEFAULTS["client_id"])
+    headers = {
+        "X-Plex-Product": "plexctl",
+        "X-Plex-Version": "0.1.0",
+        "X-Plex-Platform": "Python",
+        "X-Plex-Provides": "controller",
+        "Accept": "application/json",
+        "X-Plex-Token": token,
+        "X-Plex-Client-Identifier": client_id,
+        "X-Plex-Target-Client-Identifier": client["machineIdentifier"],
+    }
+    params = {"commandID": _next_command_id()}
+    if extra_params:
+        params.update(extra_params)
+    url = client["baseurl"].rstrip("/") + path
+    try:
+        r = requests.get(url, headers=headers, params=params, timeout=10)
+        r.raise_for_status()
+        return r.json() if r.text.strip() else {}
+    except requests.exceptions.RequestException:
+        return None
+
+
+def _get_session_state(client: dict) -> str | None:
+    from plexctl import api
+    machine_id = client.get("machineIdentifier")
+    try:
+        data = api.get("/status/sessions")
+    except SystemExit:
+        return None
+    for s in data.get("MediaContainer", {}).get("Metadata", []) or []:
+        player = s.get("Player", {})
+        if player.get("machineIdentifier") == machine_id:
+            return player.get("state")
+    return None
+
+
 def _get_view_offset(client: dict) -> int | None:
     from plexctl import api
     machine_id = client.get("machineIdentifier")
@@ -94,8 +135,18 @@ def set_volume(client: dict, level: int) -> dict:
     return _player_cmd(client, "/player/playback/setParameters", {"volume": level})
 
 
-def seek(client: dict, position: str) -> dict:
+def seek(client: dict, position: str, unpause: bool = True) -> dict:
     position = position.strip()
+
+    def _do_seek(offset_ms: int) -> dict:
+        was_paused = unpause and _get_session_state(client) == "paused"
+        if was_paused:
+            _player_cmd(client, "/player/playback/play")
+            time.sleep(1.0)
+        result = _player_cmd(client, "/player/playback/seekTo", {"offset": offset_ms})
+        if was_paused and result.get("ok"):
+            _player_cmd(client, "/player/playback/pause")
+        return result
 
     rel = re.fullmatch(r"([+-])(\d+(?:\.\d+)?)([sm])", position)
     if rel:
@@ -104,14 +155,13 @@ def seek(client: dict, position: str) -> dict:
         offset = _get_view_offset(client)
         if offset is None:
             return {"ok": False, "error": "could not determine current playback position"}
-        target = max(0, offset + (delta_ms if sign == "+" else -delta_ms))
-        return _player_cmd(client, "/player/playback/seekTo", {"offset": target})
+        return _do_seek(max(0, offset + (delta_ms if sign == "+" else -delta_ms)))
 
     ts = re.fullmatch(r"(?:(\d+):)?(\d{1,2}):(\d{2})", position)
     if ts:
         h, m, s = ts.groups()
         total_ms = (int(h) * 3600 + int(m) * 60 + int(s)) * 1000 if h else (int(m) * 60 + int(s)) * 1000
-        return _player_cmd(client, "/player/playback/seekTo", {"offset": total_ms})
+        return _do_seek(total_ms)
 
     return {"ok": False, "error": f"unrecognised position format: {position!r}"}
 

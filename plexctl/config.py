@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import tomllib
@@ -33,6 +34,6 @@ def require(key: str) -> str:
     cfg = load()
     val = cfg.get(key)
     if not val:
-        print(f'{{"ok": false, "error": "missing config key: {key} — run plexctl auth login"}}')
+        print(json.dumps({"ok": False, "error": f"missing config key: {key} — run plexctl auth login"}))
         sys.exit(1)
     return val

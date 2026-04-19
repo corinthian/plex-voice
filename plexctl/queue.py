@@ -36,14 +36,16 @@ def create(rating_keys: list[str], shuffle: bool = False, repeat: bool = False) 
 
 
 def current_queue_id(client: dict) -> str | None:
-    data = api.get("/status/sessions")
-    sessions = data.get("MediaContainer", {}).get("Metadata", [])
-    machine_id = client.get("machineIdentifier")
-    for session in sessions:
-        player = session.get("Player", {})
-        if player.get("machineIdentifier") == machine_id:
-            qid = session.get("playQueueID")
-            return str(qid) if qid is not None else None
+    from plexctl.playback import _player_get
+    data = _player_get(client, "/player/timeline/poll", {"wait": 0})
+    if not data:
+        return None
+    timelines = data.get("MediaContainer", {}).get("Timeline", []) or []
+    for t in timelines:
+        if t.get("type") == "video":
+            qid = t.get("playQueueID")
+            if qid is not None:
+                return str(qid)
     return None
 
 
