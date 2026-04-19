@@ -14,7 +14,7 @@ Only the following clients can be controlled:
 | Client | Status |
 |---|---|
 | Apple TV | ✅ Default target |
-| iPad | ✅ Likely works — Plex app must be open |
+| iPad | ❌ Not controllable — no Companion HTTP endpoint (port=null) |
 | Plex for Mac | ❌ Not controllable |
 | Plex Web (browser) | ❌ Not controllable |
 
