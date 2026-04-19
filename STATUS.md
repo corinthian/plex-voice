@@ -62,8 +62,6 @@ Observed: 2026-04-18
 
 - Volume on Apple TV: tvOS may not honor Plex volume commands vs system volume (untested)
 - End-to-end iPad → macOS Claude → plexctl voice relay not yet exercised
-- Skill grammar update needed: document `plexctl metadata`, `plexctl library sections/list`,
-  and the N+1 pattern for language-filtered requests
 
 ---
 
