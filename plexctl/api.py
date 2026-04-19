@@ -1,3 +1,4 @@
+import json
 import sys
 import requests
 from plexctl import config as cfg
@@ -32,10 +33,10 @@ def plex_tv_get(path: str, params: dict | None = None, timeout: int = 10) -> dic
         r.raise_for_status()
         return r.json()
     except requests.exceptions.ConnectionError as e:
-        print(f'{{"ok": false, "error": "plex.tv connection failed: {e}"}}')
+        print(json.dumps({"ok": False, "error": f"plex.tv connection failed: {e}"}))
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        print(f'{{"ok": false, "error": "plex.tv HTTP {r.status_code}: {r.text[:200]}"}}')
+        print(json.dumps({"ok": False, "error": f"plex.tv HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)
 
 
@@ -50,10 +51,10 @@ def get(path: str, params: dict | None = None, timeout: int = 10) -> dict:
         r.raise_for_status()
         return r.json() if r.text.strip() else {}
     except requests.exceptions.ConnectionError as e:
-        print(f'{{"ok": false, "error": "connection failed: {e}"}}')
+        print(json.dumps({"ok": False, "error": f"connection failed: {e}"}))
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        print(f'{{"ok": false, "error": "HTTP {r.status_code}: {r.text[:200]}"}}')
+        print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)
 
 
@@ -66,12 +67,12 @@ def post(path: str, params: dict | None = None, timeout: int = 10) -> dict:
     try:
         r = requests.post(url, headers=_headers(token, client_id), params=params, timeout=timeout)
         r.raise_for_status()
-        return r.json()
+        return r.json() if r.text.strip() else {}
     except requests.exceptions.ConnectionError as e:
-        print(f'{{"ok": false, "error": "connection failed: {e}"}}')
+        print(json.dumps({"ok": False, "error": f"connection failed: {e}"}))
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        print(f'{{"ok": false, "error": "HTTP {r.status_code}: {r.text[:200]}"}}')
+        print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)
 
 
@@ -84,12 +85,12 @@ def put(path: str, params: dict | None = None, timeout: int = 10) -> dict:
     try:
         r = requests.put(url, headers=_headers(token, client_id), params=params, timeout=timeout)
         r.raise_for_status()
-        return r.json()
+        return r.json() if r.text.strip() else {}
     except requests.exceptions.ConnectionError as e:
-        print(f'{{"ok": false, "error": "connection failed: {e}"}}')
+        print(json.dumps({"ok": False, "error": f"connection failed: {e}"}))
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        print(f'{{"ok": false, "error": "HTTP {r.status_code}: {r.text[:200]}"}}')
+        print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)
 
 
@@ -102,10 +103,10 @@ def delete(path: str, params: dict | None = None, timeout: int = 10) -> dict:
     try:
         r = requests.delete(url, headers=_headers(token, client_id), params=params, timeout=timeout)
         r.raise_for_status()
-        return r.json()
+        return r.json() if r.text.strip() else {}
     except requests.exceptions.ConnectionError as e:
-        print(f'{{"ok": false, "error": "connection failed: {e}"}}')
+        print(json.dumps({"ok": False, "error": f"connection failed: {e}"}))
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        print(f'{{"ok": false, "error": "HTTP {r.status_code}: {r.text[:200]}"}}')
+        print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)

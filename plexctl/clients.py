@@ -22,7 +22,6 @@ def _registered_devices() -> list[dict]:
 
 def list_clients() -> list[dict]:
     active = _active_clients()
-    active_by_id = {c["machineIdentifier"]: c for c in active}
     active_by_name = {c["name"].lower(): c for c in active}
 
     registered = _registered_devices()

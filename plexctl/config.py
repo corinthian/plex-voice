@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import tomllib
@@ -23,7 +24,8 @@ def save(data: dict) -> None:
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     lines = []
     for k, v in data.items():
-        lines.append(f'{k} = "{v}"')
+        escaped = str(v).replace("\\", "\\\\").replace('"', '\\"')
+        lines.append(f'{k} = "{escaped}"')
     CONFIG_PATH.write_text("\n".join(lines) + "\n")
     CONFIG_PATH.chmod(0o600)
 
@@ -32,6 +34,6 @@ def require(key: str) -> str:
     cfg = load()
     val = cfg.get(key)
     if not val:
-        print(f'{{"ok": false, "error": "missing config key: {key} — run plexctl auth login"}}')
+        print(json.dumps({"ok": False, "error": f"missing config key: {key} — run plexctl auth login"}))
         sys.exit(1)
     return val
