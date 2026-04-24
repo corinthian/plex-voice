@@ -10,7 +10,7 @@ Plex's own apps are great for watching, not so great for bulk work or talking to
 
 A few concrete workflows this opens up:
 
-- *"Go through every foreign-language film in my library and turn on English subtitles by default."* Claude walks the relevant section, pulls each movie's metadata, finds the English subtitle stream, and flips it to the default — one request instead of clicking through each movie's audio/subtitle panel.
+- *"Go through every foreign-language film in my library and turn on English subtitles by default."* Claude walks the relevant section, pulls each movie's metadata, finds the English subtitle stream, and flips it on — one request instead of clicking through each movie's audio/subtitle panel.
 - *"Queue the next three unwatched episodes of Severance on the Apple TV."* The skill resolves ratingKeys, builds the play queue, and starts playback in one shot.
 - *"Rate the current movie 9/10."* The skill auto-targets whatever's on screen; no ratingKey hunt, no remote.
 - *"What haven't I watched from my sci-fi shelf this year?"* List + filter + format, all from one prompt.
