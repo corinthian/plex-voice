@@ -6,11 +6,16 @@ Control your Plex server from the command line — or by talking to Claude Code.
 
 ## Why
 
-Plex's own apps are great for watching, not so great for speaking. With `plexctl` + Claude Code you can:
+Plex's own apps are great for watching, not so great for bulk work or talking to. With `plexctl` + Claude Code you can drive your library with sentences instead of clicks.
 
-- Say *"pause"* from across the room and have the Apple TV actually pause
-- Queue up three episodes with one sentence
-- Rate the current movie 9/10 without reaching for a remote
+A few concrete workflows this opens up:
+
+- *"Go through every foreign-language film in my library and turn on English subtitles by default."* Claude walks the relevant section, pulls each movie's metadata, finds the English subtitle stream, and flips it on — one request instead of clicking through each movie's audio/subtitle panel.
+- *"Queue the next three unwatched episodes of Severance on the Apple TV."* The skill resolves ratingKeys, builds the play queue, and starts playback in one shot.
+- *"Rate the current movie 9/10."* The skill auto-targets whatever's on screen; no ratingKey hunt, no remote.
+- *"What haven't I watched from my sci-fi shelf this year?"* List + filter + format, all from one prompt.
+
+The voice-from-the-couch workflow works too, but the bulk-library work is where this actually earns its keep.
 
 ## What works right now
 
