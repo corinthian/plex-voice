@@ -29,7 +29,7 @@ def search(query: str, media_type: str | None = None) -> list[dict]:
     return _extract_metadata(resp, media_type)
 
 
-def latest_unwatched_episode(show_query: str) -> dict | None:
+def latest_unwatched_episode(show_query: str, strict: bool = False) -> dict | None:
     hits = search(show_query, media_type="show")
     if not hits:
         return None
@@ -45,6 +45,9 @@ def latest_unwatched_episode(show_query: str) -> dict | None:
     unwatched = [e for e in episodes if not e.get("viewCount", 0)]
     if unwatched:
         return unwatched[0]
+
+    if strict:
+        return None
 
     return max(episodes, key=lambda e: e.get("originallyAvailableAt", ""))
 

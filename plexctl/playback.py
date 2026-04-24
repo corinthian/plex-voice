@@ -46,8 +46,16 @@ def _player_cmd(client: dict, path: str, extra_params: dict | None = None) -> di
         return {"ok": False, "error": str(e)}
 
 
-def _player_get(client: dict, path: str, extra_params: dict | None = None) -> dict | None:
-    """GET from the client's Companion endpoint; returns parsed JSON or None on error."""
+class CompanionTransportError(Exception):
+    """Raised when a Companion-endpoint request fails (network, HTTP, or decode)."""
+
+
+def _player_get(client: dict, path: str, extra_params: dict | None = None) -> dict:
+    """GET from the client's Companion endpoint; returns parsed JSON (possibly {}).
+
+    Raises CompanionTransportError on any transport, HTTP, or JSON-decode failure so
+    callers can distinguish "unreachable client" from "empty response body".
+    """
     c = cfg.load()
     token = cfg.require("token")
     client_id = c.get("client_id", cfg.DEFAULTS["client_id"])
@@ -69,8 +77,8 @@ def _player_get(client: dict, path: str, extra_params: dict | None = None) -> di
         r = requests.get(url, headers=headers, params=params, timeout=10)
         r.raise_for_status()
         return r.json() if r.text.strip() else {}
-    except requests.exceptions.RequestException:
-        return None
+    except requests.exceptions.RequestException as e:
+        raise CompanionTransportError(str(e)) from e
 
 
 def _get_session_state(client: dict) -> str | None:
@@ -98,7 +106,13 @@ def _get_view_offset(client: dict) -> int | None:
     for s in sessions:
         player = s.get("Player", {})
         if player.get("machineIdentifier") == machine_id:
-            return int(s.get("viewOffset", 0))
+            raw = s.get("viewOffset", 0)
+            if raw is None:
+                return None
+            try:
+                return int(raw)
+            except (TypeError, ValueError):
+                return None
     return None
 
 
@@ -141,11 +155,15 @@ def seek(client: dict, position: str, unpause: bool = True) -> dict:
     def _do_seek(offset_ms: int) -> dict:
         was_paused = unpause and _get_session_state(client) == "paused"
         if was_paused:
-            _player_cmd(client, "/player/playback/play")
+            pre = _player_cmd(client, "/player/playback/play")
+            if not pre.get("ok"):
+                return {"ok": False, "error": f"could not resume before seek: {pre.get('error')}"}
             time.sleep(1.0)
         result = _player_cmd(client, "/player/playback/seekTo", {"offset": offset_ms})
         if was_paused and result.get("ok"):
-            _player_cmd(client, "/player/playback/pause")
+            post = _player_cmd(client, "/player/playback/pause")
+            if not post.get("ok"):
+                return {"ok": False, "error": f"seeked but failed to restore pause state: {post.get('error')}"}
         return result
 
     rel = re.fullmatch(r"([+-])(\d+(?:\.\d+)?)([sm])", position)

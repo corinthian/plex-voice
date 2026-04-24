@@ -39,8 +39,22 @@ def login() -> None:
     except requests.exceptions.ConnectionError as e:
         print(json.dumps({"ok": False, "error": f"connection failed: {e}"}))
         sys.exit(1)
+    except requests.exceptions.Timeout as e:
+        print(json.dumps({"ok": False, "error": f"auth request timed out: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(json.dumps({"ok": False, "error": f"auth request failed: {e}"}))
+        sys.exit(1)
 
-    token = r.json()["user"]["authToken"]
+    try:
+        payload = r.json()
+        token = payload["user"]["authToken"]
+    except requests.exceptions.JSONDecodeError as e:
+        print(json.dumps({"ok": False, "error": f"plex.tv returned non-JSON response: {e}"}))
+        sys.exit(1)
+    except (KeyError, TypeError):
+        print(json.dumps({"ok": False, "error": "unexpected auth response shape from plex.tv"}))
+        sys.exit(1)
 
     # Verify PMS is reachable before writing config
     try:

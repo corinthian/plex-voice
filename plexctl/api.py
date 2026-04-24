@@ -38,6 +38,15 @@ def plex_tv_get(path: str, params: dict | None = None, timeout: int = 10) -> dic
     except requests.exceptions.HTTPError as e:
         print(json.dumps({"ok": False, "error": f"plex.tv HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)
+    except requests.exceptions.Timeout as e:
+        print(json.dumps({"ok": False, "error": f"plex.tv request timed out: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.JSONDecodeError as e:
+        print(json.dumps({"ok": False, "error": f"plex.tv returned non-JSON response: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(json.dumps({"ok": False, "error": f"plex.tv request failed: {e}"}))
+        sys.exit(1)
 
 
 def get(path: str, params: dict | None = None, timeout: int = 10) -> dict:
@@ -55,6 +64,15 @@ def get(path: str, params: dict | None = None, timeout: int = 10) -> dict:
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
         print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
+        sys.exit(1)
+    except requests.exceptions.Timeout as e:
+        print(json.dumps({"ok": False, "error": f"request timed out: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.JSONDecodeError as e:
+        print(json.dumps({"ok": False, "error": f"invalid JSON response: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(json.dumps({"ok": False, "error": f"request failed: {e}"}))
         sys.exit(1)
 
 
@@ -74,6 +92,15 @@ def post(path: str, params: dict | None = None, timeout: int = 10) -> dict:
     except requests.exceptions.HTTPError as e:
         print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)
+    except requests.exceptions.Timeout as e:
+        print(json.dumps({"ok": False, "error": f"request timed out: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.JSONDecodeError as e:
+        print(json.dumps({"ok": False, "error": f"invalid JSON response: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(json.dumps({"ok": False, "error": f"request failed: {e}"}))
+        sys.exit(1)
 
 
 def put(path: str, params: dict | None = None, timeout: int = 10) -> dict:
@@ -92,6 +119,15 @@ def put(path: str, params: dict | None = None, timeout: int = 10) -> dict:
     except requests.exceptions.HTTPError as e:
         print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
         sys.exit(1)
+    except requests.exceptions.Timeout as e:
+        print(json.dumps({"ok": False, "error": f"request timed out: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.JSONDecodeError as e:
+        print(json.dumps({"ok": False, "error": f"invalid JSON response: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(json.dumps({"ok": False, "error": f"request failed: {e}"}))
+        sys.exit(1)
 
 
 def delete(path: str, params: dict | None = None, timeout: int = 10) -> dict:
@@ -109,4 +145,13 @@ def delete(path: str, params: dict | None = None, timeout: int = 10) -> dict:
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
         print(json.dumps({"ok": False, "error": f"HTTP {r.status_code}: {r.text[:200]}"}))
+        sys.exit(1)
+    except requests.exceptions.Timeout as e:
+        print(json.dumps({"ok": False, "error": f"request timed out: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.JSONDecodeError as e:
+        print(json.dumps({"ok": False, "error": f"invalid JSON response: {e}"}))
+        sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(json.dumps({"ok": False, "error": f"request failed: {e}"}))
         sys.exit(1)

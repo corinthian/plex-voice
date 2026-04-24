@@ -16,8 +16,15 @@ DEFAULTS = {
 def load() -> dict:
     if not CONFIG_PATH.exists():
         return {}
-    with open(CONFIG_PATH, "rb") as f:
-        return tomllib.load(f)
+    try:
+        with open(CONFIG_PATH, "rb") as f:
+            return tomllib.load(f)
+    except tomllib.TOMLDecodeError as e:
+        print(json.dumps({
+            "ok": False,
+            "error": f"invalid config at {CONFIG_PATH}: {e} — run plexctl auth login",
+        }))
+        sys.exit(1)
 
 
 def save(data: dict) -> None:

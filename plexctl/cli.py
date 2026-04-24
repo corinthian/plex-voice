@@ -175,8 +175,11 @@ def play_latest(query, client, unwatched, key_only):
     Use --unwatched to force the next unwatched episode even if in-progress exists.
     Use --key-only to resolve the ratingKey without starting playback.
     """
-    item = library.latest_unwatched_episode(query)
+    item = library.latest_unwatched_episode(query, strict=unwatched)
     if not item:
+        if unwatched:
+            _out({"ok": False, "error": f"no unwatched episodes for: {query!r}"})
+            return
         # Fall back to movie search
         movies = library.search(query, media_type="movie")
         if not movies:
