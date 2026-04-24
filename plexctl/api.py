@@ -5,7 +5,7 @@ from plexctl import config as cfg
 
 PLEX_HEADERS = {
     "X-Plex-Product": "plexctl",
-    "X-Plex-Version": "0.1.0",
+    "X-Plex-Version": "1.0.0",
     "X-Plex-Platform": "Python",
     "X-Plex-Provides": "controller",
     "Accept": "application/json",
