@@ -7,7 +7,7 @@ from plexctl import config as cfg
 PLEX_TV_SIGNIN = "https://plex.tv/users/sign_in.json"
 PLEX_HEADERS = {
     "X-Plex-Product": "plexctl",
-    "X-Plex-Version": "0.1.0",
+    "X-Plex-Version": "1.0.0",
     "X-Plex-Platform": "Python",
     "Accept": "application/json",
 }

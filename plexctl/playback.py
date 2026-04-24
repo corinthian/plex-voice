@@ -20,7 +20,7 @@ def _player_cmd(client: dict, path: str, extra_params: dict | None = None) -> di
 
     headers = {
         "X-Plex-Product": "plexctl",
-        "X-Plex-Version": "0.1.0",
+        "X-Plex-Version": "1.0.0",
         "X-Plex-Platform": "Python",
         "X-Plex-Provides": "controller",
         "Accept": "application/json",
@@ -61,7 +61,7 @@ def _player_get(client: dict, path: str, extra_params: dict | None = None) -> di
     client_id = c.get("client_id", cfg.DEFAULTS["client_id"])
     headers = {
         "X-Plex-Product": "plexctl",
-        "X-Plex-Version": "0.1.0",
+        "X-Plex-Version": "1.0.0",
         "X-Plex-Platform": "Python",
         "X-Plex-Provides": "controller",
         "Accept": "application/json",
