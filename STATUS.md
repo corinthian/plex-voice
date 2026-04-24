@@ -1,6 +1,6 @@
 # plexctl — Project Status
 
-Last updated: 2026-04-19
+Last updated: 2026-04-24
 
 ---
 
@@ -127,8 +127,8 @@ Voice (iPad) → macOS Claude Code → plexctl CLI
                                         │
                             ┌───────────┴──────────────┐
                             │                          │
-                    PMS (funtime.local:32400)   Apple TV direct
-                    library/search/sessions      172.16.1.53:32500
+                    PMS (<pms-host>:32400)      Apple TV direct
+                    library/search/sessions      <client-host>:32500
                     X-Plex-Provides: controller  /player/playback/*
 ```
 
@@ -138,10 +138,10 @@ Voice (iPad) → macOS Claude Code → plexctl CLI
 
 | Client | Controllable | Notes |
 |---|---|---|
-| Apple TV | ✅ | Direct HTTP → 172.16.1.53:32500 |
-| Plex Web (Safari/funtime.local) | ❌ | WebSocket pub/sub only — no HTTP endpoint |
-| Plex for Mac (slab.maximillian) | ❌ | Does not register as Companion client with remote PMS |
-| iPad | ❌ | Streams fine (appears in sessions) but port=null — no Companion endpoint |
+| Apple TV | Yes | Direct HTTP to the device's Companion port (32500) |
+| Plex Web (Safari) | No | WebSocket pub/sub only — no HTTP endpoint |
+| Plex for Mac | No | Does not register as Companion client with remote PMS |
+| iPad | No | Streams fine (appears in sessions) but port=null — no Companion endpoint |
 
 Plex Web and Plex for Mac use a WebSocket-based control mechanism that requires a
 persistent subscriber session. There is no simple HTTP path for external scripts.
@@ -157,7 +157,7 @@ Without this header, PMS returns an empty `/clients` response. Modern clients
 ### Direct-to-client HTTP is required
 PMS proxy (`GET /player/playback/*` with `X-Plex-Target-Client-Identifier`) times out
 for Apple TV. Commands must go directly to the Apple TV's Companion server at its
-local IP/port (`172.16.1.53:32500`). The Apple TV still requires `X-Plex-Target-Client-Identifier`
+local IP on port 32500. The Apple TV still requires `X-Plex-Target-Client-Identifier`
 in the direct request headers.
 
 ### `type=video` is required on all player commands
@@ -181,11 +181,13 @@ result. Allows "play Dune" to work without knowing the ratingKey.
 ## Files
 
 ```
-/Users/rlarsen/Projects/plex-voice/
+plex-voice/
 ├── pyproject.toml
 ├── README.md
+├── DOCS.md
 ├── CLAUDE.md              ← intent grammar for Claude sessions
 ├── STATUS.md
+├── .claude/skills/plex/SKILL.md   ← /plex Claude Code skill
 ├── plexctl/
 │   ├── __init__.py
 │   ├── __main__.py
@@ -195,6 +197,7 @@ result. Allows "play Dune" to work without knowing the ratingKey.
 │   ├── clients.py
 │   ├── library.py
 │   ├── playback.py
+│   ├── queue.py
 │   ├── sessions.py
 │   └── cli.py
 └── tests/
@@ -202,4 +205,4 @@ result. Allows "play Dune" to work without knowing the ratingKey.
 ```
 
 Config: `~/.config/plexctl/config.toml` (chmod 600)
-Install: `pipx install -e /Users/rlarsen/Projects/plex-voice`
+Install: `pipx install -e /path/to/plex-voice`

@@ -7,9 +7,9 @@ from pathlib import Path
 CONFIG_PATH = Path.home() / ".config" / "plexctl" / "config.toml"
 
 DEFAULTS = {
-    "server_url": "http://funtime.local:32400",
+    "server_url": "http://plex.local:32400",
     "default_client": "Apple TV",
-    "client_id": "plexctl-rlarsen",
+    "client_id": "plexctl-default",
 }
 
 
