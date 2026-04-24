@@ -1,185 +1,90 @@
 # plexctl
 
-Command-line Plex remote control designed for voice-driven use via dictation or scripting. Controls playback on LAN clients — Apple TV tested and working.
+Control your Plex server from the command line — or by talking to Claude Code.
 
-## Requirements
+`plexctl` is a small Python CLI that drives Plex playback on LAN clients and emits JSON on every call, so it plays nicely with scripts, automation, and LLMs. It ships with a `/plex` Claude Code skill that turns phrases like *"play the next unwatched episode of The Bear"* into the right `plexctl` invocation.
 
-- Python 3.11+
-- pipx
-- Plex Media Server on your LAN
-- Plex account
+## Why
+
+Plex's own apps are great for watching, not so great for speaking. With `plexctl` + Claude Code you can:
+
+- Say *"pause"* from across the room and have the Apple TV actually pause
+- Queue up three episodes with one sentence
+- Rate the current movie 9/10 without reaching for a remote
+
+## What works right now
+
+| Client | Controllable? |
+|---|---|
+| Apple TV | Yes — the default, well-tested target |
+| iPad / iPhone | No — iOS Plex has no Companion HTTP endpoint |
+| Plex for Mac | No — it is a WebSocket client, not HTTP |
+| Plex Web (browser) | No — same story |
+
+The Plex app must be open and active on the target device.
 
 ## Install
 
 ```
 pipx install -e /path/to/plex-voice
-```
-
-## Setup
-
-```
 plexctl auth login
 ```
 
-Prompts for credentials, writes token to `~/.config/plexctl/config.toml` (chmod 600).
+`auth login` prompts for plex.tv credentials, exchanges them for a token, and writes it to `~/.config/plexctl/config.toml` (chmod 600). Your password never touches disk.
 
----
+## Using it
 
-## Client Compatibility
-
-| Client | Controllable |
-|---|---|
-| Apple TV | Yes — default target |
-| iPad / iPhone | No — iOS Plex app does not expose a Companion HTTP endpoint |
-| Plex for Mac | No — does not register as a Companion client |
-| Plex Web | No — WebSocket only |
-
-The Plex app must be open and active on the target device. Default client is Apple TV; override with `--client "Name"`.
-
----
-
-## Commands
-
-### Auth
+The CLI is self-describing:
 
 ```
-plexctl auth login
+plexctl --help
 ```
 
-### Clients
+Most commands accept `--client NAME`. Omit it and Apple TV is assumed.
+
+Quick tour:
 
 ```
-plexctl clients
+plexctl pause
+plexctl seek +30s
+plexctl volume 40
+plexctl play-latest "Strange New Worlds" --unwatched
+plexctl queue-show
+plexctl now-playing
+plexctl history --limit 5
 ```
 
-Lists all registered devices and which are currently controllable.
+Every command prints exactly one JSON object to stdout. `{"ok": true, ...}` on success, `{"ok": false, "error": "..."}` + exit code 1 on failure. That is the whole contract.
 
-### Transport
+## Voice control via Claude Code
 
-```
-plexctl play    [--client NAME]
-plexctl pause   [--client NAME]
-plexctl stop    [--client NAME]
-plexctl next    [--client NAME]
-plexctl prev    [--client NAME]
-```
-
-### Seek
+This repo ships a Claude Code skill at `.claude/skills/plex/SKILL.md`. Invoke `/plex` inside Claude Code and it maps spoken intent onto `plexctl` commands:
 
 ```
-plexctl seek <position> [--client NAME]
+/plex pause the Apple TV
+/plex what's playing
+/plex play the next unwatched Severance
+/plex shuffle the queue
+/plex debug search Dune           # echo command + show ratingKey columns
 ```
 
-Formats: `1:30` (absolute), `+30s`, `-10s`, `+2m`.
+The skill handles row-number mapping (*"play #2"*, *"remove #3"*), movie-year formatting, and sane defaults when intent is ambiguous.
 
-### Volume
+## Commands at a glance
 
-```
-plexctl volume <0-100> [--client NAME]
-```
+- **Auth / setup** — `auth login`, `clients`
+- **Transport** — `play`, `pause`, `stop`, `next`, `prev`, `seek`, `volume`
+- **Library** — `search`, `library sections`, `library list`, `metadata`
+- **Targeted playback** — `play-latest`, `play-media`, `queue`
+- **Queue control** — `queue-show`, `queue-shuffle`, `queue-unshuffle`, `queue-clear`, `queue-remove`
+- **Status** — `now-playing`, `continue-watching`, `history`
+- **Watch state** — `watched`, `unwatched`, `rate`
 
-### Search
+Full reference, architecture, and internals in [DOCS.md](DOCS.md). Rolling bug / future-work list in [STATUS.md](STATUS.md).
 
-```
-plexctl search <query> [--type show|movie|episode] [--json]
-```
+## Requirements
 
-### Play Latest / Next Unwatched
-
-```
-plexctl play-latest <query> [--client NAME] [--unwatched]
-```
-
-Plays the most recent episode of a show, or next unwatched with `--unwatched`. Falls back to movie search if no show is found.
-
-### Play by Rating Key
-
-```
-plexctl play-media <ratingKey> [--client NAME]
-```
-
-### Play Queue
-
-```
-plexctl queue <ratingKey> [ratingKey ...] [--client NAME] [--shuffle] [--repeat]
-```
-
-Creates a play queue from one or more rating keys and starts playback immediately. Episodes autoplay in sequence.
-
-### Queue Management
-
-```
-plexctl queue-show      [--client NAME]   # list items in current queue
-plexctl queue-shuffle   [--client NAME]   # shuffle on
-plexctl queue-unshuffle [--client NAME]   # shuffle off
-plexctl queue-clear     [--client NAME]   # remove all items
-plexctl queue-remove <playQueueItemID> [--client NAME]
-```
-
-Queue ID is resolved at runtime from the active session — no local state.
-
-### Now Playing
-
-```
-plexctl now-playing [--client NAME]
-```
-
-Returns current title, type, show/season/episode, position, duration, and player state.
-
-### Watched / Unwatched / Rating
-
-```
-plexctl watched   [ratingKey] [--client NAME]
-plexctl unwatched [ratingKey] [--client NAME]
-plexctl rate <0-10> [ratingKey] [--client NAME]
-```
-
-Omit `ratingKey` to target the currently playing item.
-
-### Continue Watching
-
-```
-plexctl continue-watching
-```
-
-### History
-
-```
-plexctl history [--limit N]
-```
-
----
-
-## Output
-
-All commands print a single JSON object to stdout.
-
-```json
-{"ok": true, ...}
-{"ok": false, "error": "..."}
-```
-
-Exit code is 0 on success, 1 on error.
-
----
-
-## Architecture
-
-```
-Voice (iPad dictation) → macOS Claude Code session → plexctl
-                                                          │
-                                              ┌───────────┴──────────────┐
-                                              │                          │
-                                      PMS (funtime.local:32400)   Apple TV direct
-                                      library / search / sessions   172.16.1.53:32500
-                                      X-Plex-Provides: controller   /player/playback/*
-```
-
-Commands that query media (search, library, sessions, history) go through PMS. Transport commands go directly to the client's Companion HTTP server.
-
-## Technical Notes
-
-- `X-Plex-Provides: controller` is required on all PMS requests or `/clients` returns empty
-- All player commands require `type=video` or they silently time out on Apple TV
-- `commandID` is seeded from `int(time.time())` to stay monotonically increasing across CLI invocations — Apple TV tracks the last-seen ID and drops stale commands
-- `playMedia` and `play_queue` require `address` and `port` params so the Apple TV knows which PMS to fetch from
+- Python 3.11+
+- pipx (or any venv — `pip install -e .` works fine)
+- A Plex Media Server reachable on the LAN
+- A Plex account
